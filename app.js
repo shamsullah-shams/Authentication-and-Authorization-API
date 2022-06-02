@@ -1,5 +1,4 @@
 const express = require('express');
-const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const authRoutes = require('./route/auth');
 const homeRoutes = require('./route/home');
@@ -9,7 +8,8 @@ const { default: mongoose } = require('mongoose');
 
 
 require('dotenv').config();
-require('./controller/googleAuth');
+const FacebookAuth = require('./controller/facebookAuth');
+const GoogleAuth = require('./controller/googleAuth');
 
 const MONGODB_URL = 'mongodb://localhost:27017/Auth_API'
 
@@ -24,8 +24,10 @@ app.use(session({
     saveUninitialized: false,
     secret: 'MY LONG SECRET'
 }));
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 

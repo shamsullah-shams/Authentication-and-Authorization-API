@@ -11,19 +11,33 @@
 <body>
     <h1>Sign Up</h1>
     <form action="/signup" method="POST">
-        <label>Enter name</label>
-        <input name="name" />
-        <label>Enter Email or Phone</label>
-        <input name="email" />
+        <div>
+            <label>Enter name</label>
+            <input name="name" />
+        </div>
+        <div>
+            <label>Enter Email</label>
+            <input name="email" />
+        </div>
+        <div>
+            <select name="roll" id="">
+                <option value="Super Admin">Super Admin</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Clinic">Clinic</option>
+                <option value="Patient">Patient</option>
+            </select>
+        </div>
         <button>submit</button>
     </form>
+    <div>
+        <a href="/signin">sign in</a>
+    </div>
     <div>
         <a href="/auth/google">Sign up with google</a>
     </div>
     <div>
-        <a href="/signin">sign in</a>
+        <a href="/auth/facebook">sign up with facebook</a>
     </div>
-
 </body>
 
 </html>

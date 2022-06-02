@@ -11,12 +11,20 @@
 <body>
     <h1>Sign In</h1>
     <form action="/signin" method="POST">
-        <label>Enter Email or Phone</label>
-        <input type="text" name="email" />
+        <div>
+            <label>Enter Email</label>
+            <input type="text" name="email" />
+        </div>
         <button>Submit</button>
     </form>
     <div>
         <a href="/signup">sign up</a>
+    </div>
+    <div>
+        <a href="/auth/google">sign in with google</a>
+    </div>
+    <div>
+        <a href="/signin/with/facebook">sign in with facebook</a>
     </div>
 </body>
 

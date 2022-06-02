@@ -9,7 +9,8 @@ exports.getSignUp = (req, res, next) => {
 
 
 exports.postSignUp = (req, res, next) => {
-    const { name, email } = req.body;
+    const { name, email, roll } = req.body;
+    console.log(roll);
 
     if (!name || !email) {
         return res.json({ message: "name and email are required" });
@@ -21,7 +22,7 @@ exports.postSignUp = (req, res, next) => {
         service: 'gmail',
         auth: {
             user: "shamsullahshamsi99@gmail.com",
-            pass: "Shamsi1212"
+            pass: "Shamsi12123"
         }
     });
 
@@ -29,7 +30,7 @@ exports.postSignUp = (req, res, next) => {
         from: "shamsullahshamsi99@gmail.com",
         to: email,
         subject: "OTP Code",
-        text: `${otp} is your email verification code please very it`
+        text: `<h1>${otp} is your email verification code please very it</h1>`
     }
 
     try {
@@ -45,6 +46,7 @@ exports.postSignUp = (req, res, next) => {
     const token = jwt.sign({
         name: name,
         email: email,
+        roll: roll,
         otp: otp,
     }, process.env.SECRET, { expiresIn: '1h' });
 
@@ -67,13 +69,13 @@ exports.postVarifyEmail = async (req, res, next) => {
         return res.send('Not Authorized');
     }
 
-    const { name, email, otp } = decodedToken;
+    const { name, email, otp, roll } = decodedToken;
     if (otp !== Number(otpCode)) {
         return res.send({ message: "OTP code is incorrect" });
     }
 
 
-    const newUser = new User({ name: name, email: email, varified: true });
+    const newUser = new User({ name: name, email: email, varified: true, roll: roll });
     await newUser.save();
     res.redirect('/signin');
 }
@@ -84,6 +86,12 @@ exports.getSignIn = (req, res, next) => {
 }
 
 exports.postSignIn = async (req, res, next) => {
+
+    if (req.session.passport) {
+        req.session.user = req.session.passport.user;
+        return res.redirect('/');
+    }
+
     const { email } = req.body;
     if (!email) {
         return res.json({ message: "email is required" });
@@ -95,9 +103,23 @@ exports.postSignIn = async (req, res, next) => {
             return res.json({ message: "user not found" });
         }
 
-        req.session.varified = true;
+        req.session.user = user;
         res.redirect('/');
     } catch (error) {
 
     }
+}
+
+
+exports.authSuccess = (req, res, next) => {
+    if (!req.user.status) {
+        req.session.user = req.user;
+        return res.redirect('/');
+    }
+    res.redirect('/signin');
+}
+
+
+exports.authFailer = (req, res, next) => {
+    res.redirect('/signup');
 }

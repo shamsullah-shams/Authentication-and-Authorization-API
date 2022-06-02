@@ -11,10 +11,15 @@ const User = new Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     varified: {
         type: Boolean,
         default: false,
+    },
+    roll: {
+        type: String,
+        default: 'patient'
     }
 }, { timeStamps: true });
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const { redirect } = require('express/lib/response');
 const passport = require('passport');
 const authController = require('../controller/auth');
 const authMiddleware = require('../middleware/auth');
@@ -11,19 +12,17 @@ router.get('/signup', authMiddleware.isNotAuth, authController.getSignUp);
 router.post('/signup', authMiddleware.isNotAuth, authController.postSignUp);
 router.get('/signin', authMiddleware.isNotAuth, authController.getSignIn);
 router.post('/signin', authMiddleware.isNotAuth, authController.postSignIn);
-router.post('/verifyEmail', authMiddleware.isNotAuth, authController.postVarifyEmail)
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }), (req, res, next) => {
-    console.log(req.body);
-});
+router.post('/verifyEmail', authMiddleware.isNotAuth, authController.postVarifyEmail);
+router.get('/signin/with/google', authMiddleware.isNotAuth, authController.postSignIn);
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/success', authController.authSuccess);
+router.get('/auth/fail', authController.authFailer);
+router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/auth/fail', successRedirect: "/auth/success" }));
+router.get('/auth/facebook',
+    passport.authenticate('facebook', { authType: 'reauthenticate', scope: ['user_friends', 'manage_pages'] }));
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: "/signup", successRedirect: "/signin" }));
 
-router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    function (req, res) {
-        // Successful authentication, redirect home.
-        console.log(req.body);
-        res.redirect('/');
-    }
-);
 
 
 
