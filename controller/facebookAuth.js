@@ -1,5 +1,5 @@
 const FacebookStrategy = require('passport-facebook').Strategy;
-const User = require('../model/user');
+const User = require('../model/auth');
 const passport = require('passport');
 
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
@@ -18,10 +18,10 @@ passport.use(new FacebookStrategy({
 
 
 
-// passport.serializeUser((user, cb) => {
-//     cb(null, user);
-// });
+passport.serializeUser((user, cb) => {
+    cb(null, user);
+});
 
-// passport.deserializeUser((user, cb) => {
-//     cb(null, user);
-// })
+passport.deserializeUser((user, cb) => {
+    cb(null, user);
+})

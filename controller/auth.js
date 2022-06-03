@@ -1,21 +1,40 @@
 const passport = require('passport');
-const User = require('../model/user');
+const Auth = require('../model/auth');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
+const { ResultWithContext } = require('express-validator/src/chain');
 
+
+// @@ return sing up page
 exports.getSignUp = (req, res, next) => {
     res.render('signup');
 }
 
 
-exports.postSignUp = (req, res, next) => {
-    const { name, email, roll } = req.body;
-    console.log(roll);
+// @@ return sing in page
+exports.getSignIn = (req, res, next) => {
+    res.render('signin');
+}
 
-    if (!name || !email) {
-        return res.json({ message: "name and email are required" });
+
+
+// @@ get data from sign up page and send email to user
+exports.postSignUp = async (req, res, next) => {
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+        const errors = validationError.array().map(eO => {
+            return eO.msg;
+        })
+        return res.status(422).send(errors);
     }
 
+    const { email, password } = req.body;
+    const auth = await Auth.findOne({ email: email });
+    if (auth) {
+        return res.json({ message: "Email already exist" });
+    }
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     const transport = nodemailer.createTransport({
@@ -34,19 +53,14 @@ exports.postSignUp = (req, res, next) => {
     }
 
     try {
-        transport.sendMail(mailOption, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-        })
+        await transport.sendMail(mailOption);
     } catch (error) {
-
+        return res.json({ error: error });
     }
 
     const token = jwt.sign({
-        name: name,
         email: email,
-        roll: roll,
+        password: password,
         otp: otp,
     }, process.env.SECRET, { expiresIn: '1h' });
 
@@ -54,6 +68,8 @@ exports.postSignUp = (req, res, next) => {
     return res.render('verify');
 }
 
+
+// @@ get varify code from user and save the user in database,
 exports.postVarifyEmail = async (req, res, next) => {
     const { otpCode } = req.body;
 
@@ -69,40 +85,50 @@ exports.postVarifyEmail = async (req, res, next) => {
         return res.send('Not Authorized');
     }
 
-    const { name, email, otp, roll } = decodedToken;
+    const { email, otp, password } = decodedToken;
     if (otp !== Number(otpCode)) {
         return res.send({ message: "OTP code is incorrect" });
     }
 
+    try {
+        const hashPassword = await bcrypt.hash(password, 12);
+        const newUser = new Auth({ email: email, password: hashPassword, varified: true, });
+        await newUser.save();
+        res.redirect('/signin');
+    } catch (error) {
+        return res.status(500).json({ error: error })
+    }
 
-    const newUser = new User({ name: name, email: email, varified: true, roll: roll });
-    await newUser.save();
-    res.redirect('/signin');
 }
 
 
-exports.getSignIn = (req, res, next) => {
-    res.render('signin');
-}
-
+//  @@ get data from sign in page validating and saving in session
 exports.postSignIn = async (req, res, next) => {
+
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+        const errors = validationError.array().map(eO => {
+            return eO.msg;
+        })
+        return res.status(422).send(errors);
+    }
 
     if (req.session.passport) {
         req.session.user = req.session.passport.user;
         return res.redirect('/');
     }
 
-    const { email } = req.body;
-    if (!email) {
-        return res.json({ message: "email is required" });
-    }
+    const { email, password } = req.body;
 
     try {
-        const user = await User.find({ email: email });
+        const user = await Auth.findOne({ email: email });
         if (!user) {
-            return res.json({ message: "user not found" });
+            return res.json({ message: "Email Not found" });
         }
-
+        const doMatch = await bcrypt.compare(password, user.password);
+        if (!doMatch) {
+            return res.json({ message: "Password is wrong" });
+        }
         req.session.user = user;
         res.redirect('/');
     } catch (error) {
@@ -110,7 +136,7 @@ exports.postSignIn = async (req, res, next) => {
     }
 }
 
-
+// @@ success google and facebook auths
 exports.authSuccess = (req, res, next) => {
     if (!req.user.status) {
         req.session.user = req.user;
@@ -120,6 +146,8 @@ exports.authSuccess = (req, res, next) => {
 }
 
 
+
+// @@ failure google and facebook auths
 exports.authFailer = (req, res, next) => {
     res.redirect('/signup');
 }

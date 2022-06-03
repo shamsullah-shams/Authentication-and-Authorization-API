@@ -1,22 +1,57 @@
 const express = require('express');
-const { redirect } = require('express/lib/response');
 const passport = require('passport');
 const authController = require('../controller/auth');
 const authMiddleware = require('../middleware/auth');
-
-
+const { body } = require('express-validator');
+const Auth = require('../model/auth');
 const router = express.Router();
 
 
+
+// @@ get methods routes
 router.get('/signup', authMiddleware.isNotAuth, authController.getSignUp);
-router.post('/signup', authMiddleware.isNotAuth, authController.postSignUp);
 router.get('/signin', authMiddleware.isNotAuth, authController.getSignIn);
-router.post('/signin', authMiddleware.isNotAuth, authController.postSignIn);
-router.post('/verifyEmail', authMiddleware.isNotAuth, authController.postVarifyEmail);
-router.get('/signin/with/google', authMiddleware.isNotAuth, authController.postSignIn);
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/success', authController.authSuccess);
 router.get('/auth/fail', authController.authFailer);
+
+
+
+
+// @@ validating signup route
+router.post('/signup', [
+    body('email')
+        .trim()
+        .isEmail()
+        .withMessage('please enter a vilid email')
+        .normalizeEmail(),
+    body('password')
+        .trim()
+        .isLength({ min: 8 })
+        .withMessage('please enter 8 charactor long password'),
+], authMiddleware.isNotAuth, authController.postSignUp);
+
+
+
+
+// @@ validating sign in route
+router.post('/signin', [
+    body('email')
+        .trim()
+        .isEmail()
+        .withMessage('please enter a vilid email')
+        .normalizeEmail(),
+    body('password')
+        .trim()
+        .isLength({ min: 8 })
+        .withMessage('please enter 8 charactor long password'),
+], authMiddleware.isNotAuth, authController.postSignIn);
+
+
+
+
+// @@ other routes
+router.post('/verifyEmail', authMiddleware.isNotAuth, authController.postVarifyEmail);
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/auth/fail', successRedirect: "/auth/success" }));
 router.get('/auth/facebook',

@@ -4,6 +4,7 @@ const authRoutes = require('./route/auth');
 const homeRoutes = require('./route/home');
 const session = require('express-session');
 const passport = require('passport');
+const userRoutes = require('./route/user');
 const { default: mongoose } = require('mongoose');
 
 
@@ -33,6 +34,9 @@ app.use(passport.session());
 
 app.use(homeRoutes);
 app.use(authRoutes);
+app.use(userRoutes);
+
+
 
 
 mongoose.connect(MONGODB_URL, (err) => {
