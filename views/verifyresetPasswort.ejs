@@ -5,22 +5,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/form.css">
     <title>Document</title>
 </head>
 
 <body>
     <div class="main-body">
-        <h1>Clinic</h1>
-        <form action="/clinic" method="post">
+        <form action="/varifyresetpassword" method="POST">
             <div>
-                <label for="">Enter Full Name</label>
-                <input type="text" name="fullName" id="">
+                <label for="">Enter Verification code we send to your Email</label>
+                <input type="number" name="otpCode">
             </div>
             <div>
-                <label for="">Enter Location</label>
-                <input type="text" name="location" id="">
+                <button>submit</button>
             </div>
-            <button>submit</button>
         </form>
     </div>
 </body>

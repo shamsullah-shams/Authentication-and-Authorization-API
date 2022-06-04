@@ -1,0 +1,14 @@
+.main-body {
+    width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
+}
+
+label {
+    display: block;
+}

@@ -5,30 +5,37 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/form.css">
     <title>Document</title>
 </head>
 
 <body>
-    <h1>Sign Up</h1>
-    <form action="/signup" method="POST">
+    <div class="main-body">
+        <h1>Sign Up</h1>
+        <form action="/signup" method="POST">
+            <div>
+                <label>Enter email</label>
+                <input type="text" name="email" />
+            </div>
+            <div>
+                <label>Enter Phone Number</label>
+                <input type="tel" name="phoneNumber" />
+            </div>
+            <div>
+                <label>Enter password</label>
+                <input type="password" name="password" />
+            </div>
+            <button>submit</button>
+        </form>
         <div>
-            <label>Enter email</label>
-            <input type="text" name="email" />
+            <a href="/signin">sign in</a>
         </div>
         <div>
-            <label>Enter password</label>
-            <input type="password" name="password" />
+            <a href="/auth/google">Sign up with google</a>
         </div>
-        <button>submit</button>
-    </form>
-    <div>
-        <a href="/signin">sign in</a>
-    </div>
-    <div>
-        <a href="/auth/google">Sign up with google</a>
-    </div>
-    <div>
-        <a href="/auth/facebook">sign up with facebook</a>
+        <div>
+            <a href="/auth/facebook">sign up with facebook</a>
+        </div>
     </div>
 </body>
 

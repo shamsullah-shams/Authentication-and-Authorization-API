@@ -6,6 +6,7 @@ const session = require('express-session');
 const passport = require('passport');
 const userRoutes = require('./route/user');
 const { default: mongoose } = require('mongoose');
+const path = require('path')
 
 
 require('dotenv').config();
@@ -20,6 +21,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     resave: false,
     saveUninitialized: false,
